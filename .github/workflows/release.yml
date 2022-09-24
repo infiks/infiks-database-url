@@ -1,0 +1,72 @@
+name: 'Build, Pack, Push'
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+  CONFIG: 'Release'
+  TEST: true
+  BUILD_VERSION: '6.0.${{ github.run_number }}'
+  NUGET_URL: 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    # https://github.com/actions/checkout
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # https://github.com/actions/setup-dotnet
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        dotnet-version: '6.0.x'
+        source-url: ${{ env.NUGET_URL }}
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+
+    - name: Restore
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build
+            -p:VersionPrefix=${{ env.BUILD_VERSION }}
+            --configuration ${{ env.CONFIG }}
+            --no-restore
+
+    - name: Test
+      if: ${{ env.TEST == 'true' }}
+      run: dotnet test
+            --no-build
+            --no-restore
+            --configuration ${{ env.CONFIG }}
+
+    - name: Pack
+      run: |
+        PROJECTS=./**/*.csproj
+        shopt -s nullglob
+        shopt -s globstar
+        for p in $PROJECTS
+        do
+          echo "Packing $p"
+          dotnet pack $p \
+            --configuration ${{ env.CONFIG }} \
+            --no-build \
+            -p:Version=${{ env.BUILD_VERSION }}
+        done
+
+    - name: NuGet Push
+      if: ${{ github.ref == 'refs/heads/main' }}
+      run: dotnet nuget push **/*.nupkg
+            --source ${{ env.NUGET_URL }}
+            --skip-duplicate
