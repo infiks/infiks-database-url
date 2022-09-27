@@ -7,5 +7,5 @@ the connection string `Host=localhost:5432;Username=user;Password=secret;Databas
 
 This repository contains two packages:
 
-- [Infiks.Configuration](./src/Infiks.Configuration/README.md)
+- [Infiks.DatabaseUrl](./src/Infiks.DatabaseUrl/README.md)
 - [Infiks.Configuration.DatabaseUrl](./src/Infiks.Configuration.DatabaseUrl/README.md)
