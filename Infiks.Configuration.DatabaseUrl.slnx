@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".github/workflows/release.yml" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="src/Infiks.Configuration.DatabaseUrl/Infiks.Configuration.DatabaseUrl.csproj" />
+  <Project Path="src/Infiks.DatabaseUrl/Infiks.DatabaseUrl.csproj" />
+  <Project Path="test/Infiks.DatabaseUrl.Tests/Infiks.DatabaseUrl.Tests.csproj" />
+</Solution>
